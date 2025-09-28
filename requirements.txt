@@ -5,3 +5,7 @@ kedro~=1.0.0
 pandas
 openpyxl
 kedro-datasets
+matplotlib
+seaborn
+scikit-learn
+graphviz
