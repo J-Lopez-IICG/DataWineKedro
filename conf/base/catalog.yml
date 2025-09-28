@@ -1,4 +1,7 @@
-# Here you can define all your datasets by using simple YAML syntax.
-#
-# Documentation for this file format can be found in "The Data Catalog"
-# Link: https://docs.kedro.org/en/stable/data/data_catalog.html
+red_wine_csv:
+  type: kedro_datasets.pandas.CSVDataset
+  filepath: data/01_raw/winequality-red.csv
+
+processed_wine_data:
+  type: kedro_datasets.pandas.ExcelDataset
+  filepath: data/02_intermediate/wine_data.xlsx

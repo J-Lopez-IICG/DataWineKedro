@@ -28,3 +28,6 @@ attr = "datawinekedro.__version__"
 [tool.setuptools.packages.find]
 where = [ "src",]
 namespaces = false
+
+[tool.kedro_telemetry]
+project_id = "e331550d9b2a43119053586b4e41bf67"
