@@ -1,7 +1,32 @@
+# Dataset de entrada raw (CSV)
 red_wine_csv:
   type: kedro_datasets.pandas.CSVDataset
   filepath: data/01_raw/winequality-red.csv
 
+# Dataset intermedio (Excel)
+# Es la SALIDA de la pipeline 'data_ingestion'
+# y la ENTRADA de la pipeline 'data_processing'
 processed_wine_data:
   type: kedro_datasets.pandas.ExcelDataset
   filepath: data/02_intermediate/wine_data.xlsx
+
+# Dataset intermedio (Excel)
+# Es la SALIDA del nodo 'clean_wine_data_node'
+# y la ENTRADA del nodo 'rename_wine_columns_node'
+cleaned_wine_data:
+  type: kedro_datasets.pandas.ExcelDataset
+  filepath: data/02_intermediate/cleaned_wine_data.xlsx
+
+# Dataset intermedio (Excel)
+# Es la SALIDA del nodo 'rename_wine_columns_node'
+# y la ENTRADA del nodo 'create_target_and_select_features_node'
+renamed_wine_data:
+  type: kedro_datasets.pandas.ExcelDataset
+  filepath: data/02_intermediate/renamed_wine_data.xlsx
+
+# Dataset final (CSV)
+# Es la SALIDA del nodo 'create_target_and_select_features_node'
+# y la SALIDA final de la pipeline 'data_processing'
+model_input_data:
+  type: kedro_datasets.pandas.ExcelDataset
+  filepath: data/03_primary/model_input_data.xlsx
