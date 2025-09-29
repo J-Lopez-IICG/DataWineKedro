@@ -4,7 +4,7 @@
 
 ## Visión General
 
-Este proyecto Kedro implementa un pipeline de ciencia de datos de extremo a extremo para clasificar la calidad del vino. La solución utiliza el conjunto de datos "Red Wine Quality", disponible en [Kaggle](https://www.kaggle.com/datasets/uciml/red-wine-quality-cortez-et-al-2009), que contiene propiedades fisicoquímicas de distintas muestras de vino. El pipeline ingiere estos datos crudos, los procesa para garantizar su calidad, entrena y evalúa múltiples modelos de clasificación (Árbol de Decisión, Random Forest, XGBoost) para predecir si un vino es de "buena" o "mala" calidad, y finalmente, evalúa y visualiza el rendimiento de los modelos.
+Este proyecto Kedro implementa un pipeline de ciencia de datos de extremo a extremo para clasificar la calidad del vino. La solución utiliza el conjunto de datos "Red Wine Quality", disponible en [Kaggle: Wine Quality](https://www.kaggle.com/datasets/uciml/red-wine-quality-cortez-et-al-2009), que contiene propiedades fisicoquímicas de distintas muestras de vino. El pipeline ingiere estos datos crudos, los procesa para garantizar su calidad, entrena y evalúa múltiples modelos de clasificación (Árbol de Decisión, Random Forest, XGBoost) para predecir si un vino es de "buena" o "mala" calidad, y finalmente, evalúa y visualiza el rendimiento de los modelos.
 
 El objetivo es demostrar un flujo de trabajo de Machine Learning estructurado y reproducible, donde cada paso, desde la limpieza de datos hasta la generación de reportes, está encapsulado en un pipeline modular y robusto.
 
