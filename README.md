@@ -100,7 +100,7 @@ Para una revisión programática y detallada, el pipeline exporta las métricas 
     "support": 450
   }
 }
-
+```
 ### La Importancia del Ajuste de Hiperparámetros
 
 El proceso de ajuste de hiperparámetros mediante GridSearchCV fue fundamental para optimizar el rendimiento de todos los modelos. Se observaron mejoras significativas en el AUC para el Árbol de Decisión y el Random Forest. Aunque el AUC de XGBoost se mantuvo en 0.87 después del ajuste, esto indica que los parámetros iniciales ya eran bastante competitivos o que el rango de búsqueda explorado no reveló mejoras significativas adicionales.
