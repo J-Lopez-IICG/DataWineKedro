@@ -60,47 +60,21 @@ Este resultado sugiere que, para el problema de clasificación de la calidad del
 
 El pipeline genera curvas ROC para cada modelo ajustado, permitiendo una comparación visual directa de su capacidad discriminatoria. A continuación, se muestra un ejemplo de la curva ROC para el mejor modelo (Random Forest):
 
-![Curva ROC del Mejor Random Forest](data/07_reporting/roc_curve_best_random_forest.png)
+![Curva ROC del Mejor Random Forest](data/07_reporting/rf_roc_curve.png)
 
 Además, se generan gráficos de importancia de características para entender qué propiedades fisicoquímicas son más relevantes para la predicción de la calidad del vino. Aquí un ejemplo para el Random Forest:
 
-![Importancia de Características del Mejor Random Forest](data/07_reporting/feature_importance_best_random_forest.png)
+![Importancia de Características del Mejor Random Forest](data/07_reporting/rf_feature_importance.png)
+
+El gráfico de importancia de características revela que no todas las propiedades fisicoquímicas influyen de la misma manera en la calidad del vino. Las conclusiones clave son:
+*   **El `Alcohol` es el factor más determinante**, siendo el predictor más fuerte para el modelo.
+*   Los `Sulfatos` y la `Acidez_Volatil` le siguen como las características más influyentes.
+*   Esto sugiere que, para este conjunto de datos, la calidad del vino está fuertemente asociada a su graduación alcohólica, su nivel de sulfatos y su acidez volátil.
 
 ### Reportes Estructurados de Métricas y Parámetros
 
 Para una revisión programática y detallada, el pipeline exporta las métricas de clasificación y los mejores hiperparámetros encontrados en formato JSON. Esto asegura la trazabilidad y reproducibilidad de los resultados.
 
-**Ejemplo de Reporte de Clasificación (Random Forest Ajustado):**
-```json
-// filepath: data/07_reporting/classification_report_best_random_forest.json
-{
-  "0": {
-    "precision": 0.93,
-    "recall": 0.95,
-    "f1-score": 0.94,
-    "support": 380
-  },
-  "1": {
-    "precision": 0.65,
-    "recall": 0.56,
-    "f1-score": 0.60,
-    "support": 70
-  },
-  "accuracy": 0.90,
-  "macro avg": {
-    "precision": 0.79,
-    "recall": 0.76,
-    "f1-score": 0.77,
-    "support": 450
-  },
-  "weighted avg": {
-    "precision": 0.89,
-    "recall": 0.90,
-    "f1-score": 0.89,
-    "support": 450
-  }
-}
-```
 ### La Importancia del Ajuste de Hiperparámetros
 
 El proceso de ajuste de hiperparámetros mediante GridSearchCV fue fundamental para optimizar el rendimiento de todos los modelos. Se observaron mejoras significativas en el AUC para el Árbol de Decisión y el Random Forest. Aunque el AUC de XGBoost se mantuvo en 0.87 después del ajuste, esto indica que los parámetros iniciales ya eran bastante competitivos o que el rango de búsqueda explorado no reveló mejoras significativas adicionales.
