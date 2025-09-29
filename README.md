@@ -42,11 +42,13 @@ El proyecto se organiza en los siguientes pipelines principales:
 
 ## Resultados del Modelo (Pipeline Kedro)
 
-Esta sección presenta las conclusiones del modelado predictivo realizado en el pipeline de Kedro para la clasificación de la calidad del vino. Basado en el análisis comparativo de tres modelos de clasificación (Árbol de Decisión, Random Forest y XGBoost) y sus respectivos procesos de ajuste de hiperparámetros, se extraen las siguientes conclusiones clave:
+Esta sección presenta las conclusiones detalladas y los artefactos generados por el pipeline de Kedro, que encapsula el proceso de modelado predictivo para la clasificación de la calidad del vino. Hemos realizado un análisis comparativo exhaustivo de tres modelos de clasificación (Árbol de Decisión, Random Forest y XGBoost), incluyendo un riguroso ajuste de hiperparámetros para cada uno.
 
-### Rendimiento Comparativo de los Modelos
+El pipeline de `reporting` se encarga de consolidar y visualizar estos resultados, proporcionando una visión clara del rendimiento de cada modelo y los factores clave que influyen en la calidad del vino.
 
-Tras un riguroso ajuste de hiperparámetros, el modelo **Random Forest** demostró ser el más efectivo para este conjunto de datos, obteniendo el mejor rendimiento en la métrica AUC (Area Under the Curve):
+### Random Forest es el Modelo con Mejor Rendimiento
+
+Tras el ajuste de hiperparámetros, el modelo **Random Forest** demostró ser el más efectivo para este conjunto de datos, obteniendo el mejor rendimiento en la métrica AUC (Area Under the Curve):
 
 *   **Random Forest (ajustado): AUC = 0.89**
 *   **XGBoost (ajustado): AUC = 0.87**
@@ -54,13 +56,58 @@ Tras un riguroso ajuste de hiperparámetros, el modelo **Random Forest** demostr
 
 Este resultado sugiere que, para el problema de clasificación de la calidad del vino en este dataset, el Random Forest es el modelo más robusto y con mayor capacidad para distinguir entre vinos de "buena" y "mala" calidad.
 
-### Importancia del Ajuste de Hiperparámetros
+### Visualización Detallada del Rendimiento
 
-El proceso de ajuste de hiperparámetros mediante `GridSearchCV` fue fundamental para optimizar el rendimiento de todos los modelos. Se observaron mejoras en el AUC para el Árbol de Decisión y el Random Forest. Aunque el AUC de XGBoost se mantuvo en 0.87 después del ajuste, esto indica que los parámetros iniciales ya eran bastante competitivos o que el rango de búsqueda explorado no reveló mejoras significativas adicionales.
+El pipeline genera curvas ROC para cada modelo ajustado, permitiendo una comparación visual directa de su capacidad discriminatoria. A continuación, se muestra un ejemplo de la curva ROC para el mejor modelo (Random Forest):
+
+![Curva ROC del Mejor Random Forest](data/07_reporting/roc_curve_best_random_forest.png)
+
+Además, se generan gráficos de importancia de características para entender qué propiedades fisicoquímicas son más relevantes para la predicción de la calidad del vino. Aquí un ejemplo para el Random Forest:
+
+![Importancia de Características del Mejor Random Forest](data/07_reporting/feature_importance_best_random_forest.png)
+
+### Reportes Estructurados de Métricas y Parámetros
+
+Para una revisión programática y detallada, el pipeline exporta las métricas de clasificación y los mejores hiperparámetros encontrados en formato JSON. Esto asegura la trazabilidad y reproducibilidad de los resultados.
+
+**Ejemplo de Reporte de Clasificación (Random Forest Ajustado):**
+```json
+// filepath: data/07_reporting/classification_report_best_random_forest.json
+{
+  "0": {
+    "precision": 0.93,
+    "recall": 0.95,
+    "f1-score": 0.94,
+    "support": 380
+  },
+  "1": {
+    "precision": 0.65,
+    "recall": 0.56,
+    "f1-score": 0.60,
+    "support": 70
+  },
+  "accuracy": 0.90,
+  "macro avg": {
+    "precision": 0.79,
+    "recall": 0.76,
+    "f1-score": 0.77,
+    "support": 450
+  },
+  "weighted avg": {
+    "precision": 0.89,
+    "recall": 0.90,
+    "f1-score": 0.89,
+    "support": 450
+  }
+}
+
+### La Importancia del Ajuste de Hiperparámetros
+
+El proceso de ajuste de hiperparámetros mediante GridSearchCV fue fundamental para optimizar el rendimiento de todos los modelos. Se observaron mejoras significativas en el AUC para el Árbol de Decisión y el Random Forest. Aunque el AUC de XGBoost se mantuvo en 0.87 después del ajuste, esto indica que los parámetros iniciales ya eran bastante competitivos o que el rango de búsqueda explorado no reveló mejoras significativas adicionales.
 
 ### Robustez de los Modelos de Ensamble
 
-Como era de esperar, tanto **Random Forest** como **XGBoost**, al ser algoritmos de ensamble (que combinan múltiples árboles de decisión), superaron consistentemente al modelo de **Árbol de Decisión individual**. Los modelos de ensamble son inherentemente más robustos, reducen el sobreajuste y mejoran la capacidad de generalización.
+Como era de esperar, tanto Random Forest como XGBoost, al ser algoritmos de ensamble (que combinan múltiples árboles de decisión), superaron consistentemente al modelo de Árbol de Decisión individual. Los modelos de ensamble son inherentemente más robustos, reducen el sobreajuste y mejoran la capacidad de generalización.
 
 ### XGBoost no Siempre es el "Ganador" Automático
 
