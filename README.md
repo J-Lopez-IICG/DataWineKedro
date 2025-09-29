@@ -4,7 +4,7 @@
 
 ## Visión General
 
-Este proyecto Kedro implementa un pipeline de ciencia de datos de extremo a extremo para clasificar la calidad del vino. La solución ingiere un conjunto de datos crudos de propiedades fisicoquímicas del vino, lo procesa para garantizar su calidad, entrena y evalúa múltiples modelos de clasificación (Árbol de Decisión, Random Forest, XGBoost) para predecir si un vino es de "buena" o "mala" calidad, y finalmente, evalúa y visualiza el rendimiento de los modelos.
+Este proyecto Kedro implementa un pipeline de ciencia de datos de extremo a extremo para clasificar la calidad del vino. La solución utiliza el conjunto de datos "Red Wine Quality", disponible en [Kaggle](https://www.kaggle.com/datasets/uciml/red-wine-quality-cortez-et-al-2009), que contiene propiedades fisicoquímicas de distintas muestras de vino. El pipeline ingiere estos datos crudos, los procesa para garantizar su calidad, entrena y evalúa múltiples modelos de clasificación (Árbol de Decisión, Random Forest, XGBoost) para predecir si un vino es de "buena" o "mala" calidad, y finalmente, evalúa y visualiza el rendimiento de los modelos.
 
 El objetivo es demostrar un flujo de trabajo de Machine Learning estructurado y reproducible, donde cada paso, desde la limpieza de datos hasta la generación de reportes, está encapsulado en un pipeline modular y robusto.
 
@@ -50,9 +50,9 @@ El pipeline de `reporting` se encarga de consolidar y visualizar estos resultado
 
 Tras el ajuste de hiperparámetros, el modelo **Random Forest** demostró ser el más efectivo para este conjunto de datos, obteniendo el mejor rendimiento en la métrica AUC (Area Under the Curve):
 
-*   **Random Forest (ajustado): AUC = 0.89**
-*   **XGBoost (ajustado): AUC = 0.87**
-*   **Árbol de Decisión (ajustado): AUC = 0.85**
+*   **Random Forest (ajustado): AUC = 0.8883**
+*   **XGBoost (ajustado): AUC = 0.8782**
+*   **Árbol de Decisión (ajustado): AUC = 0.8169**
 
 Este resultado sugiere que, para el problema de clasificación de la calidad del vino en este dataset, el Random Forest es el modelo más robusto y con mayor capacidad para distinguir entre vinos de "buena" y "mala" calidad.
 
@@ -70,10 +70,6 @@ El gráfico de importancia de características revela que no todas las propiedad
 *   **El `Alcohol` es el factor más determinante**, siendo el predictor más fuerte para el modelo.
 *   Los `Sulfatos` y la `Acidez_Volatil` le siguen como las características más influyentes.
 *   Esto sugiere que, para este conjunto de datos, la calidad del vino está fuertemente asociada a su graduación alcohólica, su nivel de sulfatos y su acidez volátil.
-
-### Reportes Estructurados de Métricas y Parámetros
-
-Para una revisión programática y detallada, el pipeline exporta las métricas de clasificación y los mejores hiperparámetros encontrados en formato JSON. Esto asegura la trazabilidad y reproducibilidad de los resultados.
 
 ### La Importancia del Ajuste de Hiperparámetros
 
