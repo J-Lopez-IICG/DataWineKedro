@@ -24,9 +24,46 @@ renamed_wine_data:
   type: kedro_datasets.pandas.ExcelDataset
   filepath: data/02_intermediate/renamed_wine_data.xlsx
 
-# Dataset final (CSV)
+# Dataset final de procesamiento (Excel)
 # Es la SALIDA del nodo 'create_target_and_select_features_node'
-# y la SALIDA final de la pipeline 'data_processing'
+# y la ENTRADA de la pipeline 'model_training'
 model_input_data:
   type: kedro_datasets.pandas.ExcelDataset
   filepath: data/03_primary/model_input_data.xlsx
+
+# --- Datasets para la pipeline de modelado ---
+
+# Conjuntos de datos divididos para entrenamiento y prueba
+# Se guardan en memoria para evitar escribir archivos pequeños en disco
+X_train:
+  type: MemoryDataSet
+X_test:
+  type: MemoryDataSet
+y_train:
+  type: MemoryDataSet
+y_test:
+  type: MemoryDataSet
+
+# Nombres de las columnas de X_train (ahora un output directo del nodo split_data)
+X_train_columns:
+  type: MemoryDataSet
+
+# El mejor modelo Random Forest entrenado
+best_random_forest_model:
+  type: kedro_datasets.pickle.PickleDataset # CAMBIO: Volvemos a kedro_datasets y con 'Dataset' en minúscula
+  filepath: data/06_models/best_random_forest_model.pkl
+
+# Métricas de evaluación del modelo (guardadas como JSON)
+rf_evaluation_metrics:
+  type: kedro_datasets.json.JSONDataset # CAMBIO: Volvemos a kedro_datasets y con 'Dataset' en minúscula
+  filepath: data/07_reporting/rf_evaluation_metrics.json
+
+# Gráfico de la curva ROC (guardado como imagen)
+rf_roc_curve_plot:
+  type: kedro_datasets.matplotlib.MatplotlibDataset # Mantenemos este, ya lo habíamos corregido
+  filepath: data/07_reporting/rf_roc_curve.png
+
+# Gráfico de importancia de características (guardado como imagen)
+rf_feature_importance_plot:
+  type: kedro_datasets.matplotlib.MatplotlibDataset # Mantenemos este, ya lo habíamos corregido
+  filepath: data/07_reporting/rf_feature_importance.png

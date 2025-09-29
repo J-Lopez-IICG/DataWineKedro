@@ -1,0 +1,28 @@
+# Parámetros para la pipeline de ingesta de datos (si los tienes)
+data_ingestion:
+  # Ejemplo:
+  # raw_data_path: "data/01_raw/winequality-red.csv"
+
+# Parámetros para la pipeline de procesamiento de datos (si los tienes)
+data_processing:
+  # Ejemplo:
+  # target_column: "quality"
+  # feature_columns: ["fixed acidity", "volatile acidity", ...]
+
+# Parámetros para la pipeline de entrenamiento del modelo
+model_training:
+  model_options:
+    target_column: "Calidad_Binaria" # CAMBIO AQUÍ: La columna objetivo ahora es 'Calidad_Binaria'
+    test_size: 0.2
+    random_state: 42
+
+    # Parámetros para GridSearchCV de RandomForest
+    param_grid_rf:
+      n_estimators: [100, 200]
+      max_depth: [10, 20, None]
+      min_samples_split: [2, 5]
+      min_samples_leaf: [1, 2]
+    grid_search_cv_folds: 5
+    grid_search_scoring: "roc_auc"
+    grid_search_n_jobs: -1
+    grid_search_verbose: 1
