@@ -1,9 +1,9 @@
-# Parámetros para la pipeline de ingesta de datos (si los tienes)
+# Parámetros para la pipeline de ingesta de datos
 data_ingestion:
   # Ejemplo:
   # raw_data_path: "data/01_raw/winequality-red.csv"
 
-# Parámetros para la pipeline de procesamiento de datos (si los tienes)
+# Parámetros para la pipeline de procesamiento de datos 
 data_processing:
   # Ejemplo:
   # target_column: "quality"
@@ -12,7 +12,7 @@ data_processing:
 # Parámetros para la pipeline de entrenamiento del modelo
 model_training:
   model_options:
-    target_column: "Calidad_Binaria" # CAMBIO AQUÍ: La columna objetivo ahora es 'Calidad_Binaria'
+    target_column: "Calidad_Binaria"
     test_size: 0.2
     random_state: 42
 
