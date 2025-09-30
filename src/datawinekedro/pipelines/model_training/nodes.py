@@ -69,7 +69,6 @@ def split_data(
 def train_random_forest_model(
     X_train: pd.DataFrame, y_train: pd.Series, parameters: Dict[str, Any]
 ) -> RandomForestClassifier:
-    # ... (sin cambios en esta función) ...
     log.info("--- Ajuste de Hiperparámetros para Random Forest (GridSearchCV) ---")
 
     param_grid_rf = parameters["param_grid_rf"]
@@ -104,7 +103,7 @@ def evaluate_model(
     model: RandomForestClassifier,
     X_test: pd.DataFrame,
     y_test: pd.Series,
-    X_train_columns: pd.Index,  # Ahora recibe pd.Index directamente
+    X_train_columns: pd.Index,
 ) -> Dict[str, Any]:
     """
     Evalúa el modelo Random Forest entrenado y calcula métricas de rendimiento.
@@ -156,7 +155,6 @@ def evaluate_model(
 def plot_roc_curve(
     y_test: pd.Series, evaluation_results: Dict[str, Any]
 ) -> matplotlib.figure.Figure:
-    # ... (sin cambios en esta función) ...
     log.info("--- Generando Curva ROC ---")
     y_pred_proba_best_rf = np.array(evaluation_results["y_pred_proba"])
     auc_score_best_rf = evaluation_results["auc_score"]
@@ -193,7 +191,6 @@ def plot_roc_curve(
 def plot_feature_importance(
     evaluation_results: Dict[str, Any],
 ) -> matplotlib.figure.Figure:
-    # ... (sin cambios en esta función) ...
     log.info("--- Generando gráfico de Importancia de Características ---")
     importancia_df = pd.DataFrame(evaluation_results["feature_importances"])
 

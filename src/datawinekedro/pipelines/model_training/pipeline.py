@@ -27,7 +27,7 @@ def create_pipeline(**kwargs) -> Pipeline:
                     "y_train",
                     "y_test",
                     "X_train_columns",
-                ],  # Añadido "X_train_columns"
+                ],
                 name="split_data_node",
             ),
             # Nodo 2: Entrena el modelo Random Forest con GridSearchCV
@@ -44,7 +44,7 @@ def create_pipeline(**kwargs) -> Pipeline:
                     "best_random_forest_model",
                     "X_test",
                     "y_test",
-                    "X_train_columns",  # Ahora usa el nuevo dataset "X_train_columns"
+                    "X_train_columns",
                 ],
                 outputs="rf_evaluation_metrics",
                 name="evaluate_random_forest_model_node",

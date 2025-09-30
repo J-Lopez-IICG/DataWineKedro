@@ -50,20 +50,20 @@ X_train_columns:
 
 # El mejor modelo Random Forest entrenado
 best_random_forest_model:
-  type: kedro_datasets.pickle.PickleDataset # CAMBIO: Volvemos a kedro_datasets y con 'Dataset' en minúscula
+  type: kedro_datasets.pickle.PickleDataset 
   filepath: data/06_models/best_random_forest_model.pkl
 
 # Métricas de evaluación del modelo (guardadas como JSON)
 rf_evaluation_metrics:
-  type: kedro_datasets.json.JSONDataset # CAMBIO: Volvemos a kedro_datasets y con 'Dataset' en minúscula
+  type: kedro_datasets.json.JSONDataset
   filepath: data/07_reporting/rf_evaluation_metrics.json
 
 # Gráfico de la curva ROC (guardado como imagen)
 rf_roc_curve_plot:
-  type: kedro_datasets.matplotlib.MatplotlibDataset # Mantenemos este, ya lo habíamos corregido
+  type: kedro_datasets.matplotlib.MatplotlibDataset 
   filepath: data/07_reporting/rf_roc_curve.png
 
 # Gráfico de importancia de características (guardado como imagen)
 rf_feature_importance_plot:
-  type: kedro_datasets.matplotlib.MatplotlibDataset # Mantenemos este, ya lo habíamos corregido
+  type: kedro_datasets.matplotlib.MatplotlibDataset 
   filepath: data/07_reporting/rf_feature_importance.png

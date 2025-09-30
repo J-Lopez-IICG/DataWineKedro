@@ -14,8 +14,8 @@ def create_pipeline(**kwargs) -> Pipeline:
         [
             node(
                 func=load_raw_data,
-                inputs="red_wine_csv",  # Lee el CSV raw
-                outputs="processed_wine_data",  # Guarda como Excel (según catalog.yml)
+                inputs="red_wine_csv",
+                outputs="processed_wine_data",
                 name="load_raw_csv_to_excel_node",
             ),
         ],
