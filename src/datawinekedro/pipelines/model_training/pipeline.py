@@ -2,7 +2,12 @@ from kedro.pipeline import Pipeline, node, pipeline
 from .nodes import (
     split_data,
     train_random_forest_model,
+    train_decision_tree_model,
+    train_xgboost_model,
     evaluate_model,
+    compare_models_and_select_best,
+    aggregate_models,
+    aggregate_metrics,
     plot_roc_curve,
     plot_feature_importance,
 )
@@ -10,7 +15,7 @@ from .nodes import (
 
 def create_pipeline(**kwargs) -> Pipeline:
     """
-    Crea la pipeline de entrenamiento y evaluación del modelo.
+    Crea la pipeline de entrenamiento, evaluación y selección del mejor modelo.
 
     Returns:
         Un objeto Kedro Pipeline.
@@ -30,46 +35,99 @@ def create_pipeline(**kwargs) -> Pipeline:
                 ],
                 name="split_data_node",
             ),
-            # Nodo 2: Entrena el modelo Random Forest con GridSearchCV
+            # --- Rama para Random Forest ---
             node(
                 func=train_random_forest_model,
                 inputs=["X_train", "y_train", "params:model_options"],
-                outputs="best_random_forest_model",
-                name="train_random_forest_model_node",
+                outputs="rf_model",
+                name="train_rf_model_node",
             ),
-            # Nodo 3: Evalúa el modelo y calcula métricas
             node(
                 func=evaluate_model,
-                inputs=[
-                    "best_random_forest_model",
-                    "X_test",
-                    "y_test",
-                    "X_train_columns",
-                ],
-                outputs="rf_evaluation_metrics",
-                name="evaluate_random_forest_model_node",
+                inputs=["rf_model", "X_test", "y_test", "X_train_columns"],
+                outputs="rf_metrics",
+                name="evaluate_rf_model_node",
             ),
-            # Nodo 4: Genera el gráfico de la curva ROC
+            # --- Rama para Decision Tree ---
+            node(
+                func=train_decision_tree_model,
+                inputs=["X_train", "y_train", "params:model_options"],
+                outputs="dt_model",
+                name="train_dt_model_node",
+            ),
+            node(
+                func=evaluate_model,
+                inputs=["dt_model", "X_test", "y_test", "X_train_columns"],
+                outputs="dt_metrics",
+                name="evaluate_dt_model_node",
+            ),
+            # --- Rama para XGBoost ---
+            node(
+                func=train_xgboost_model,
+                inputs=["X_train", "y_train", "params:model_options"],
+                outputs="xgb_model",
+                name="train_xgb_model_node",
+            ),
+            node(
+                func=evaluate_model,
+                inputs=["xgb_model", "X_test", "y_test", "X_train_columns"],
+                outputs="xgb_metrics",
+                name="evaluate_xgb_model_node",
+            ),
+            # --- Nodos de Agregación ---
+            node(
+                func=aggregate_models,
+                inputs={
+                    "rf_model": "rf_model",
+                    "dt_model": "dt_model",
+                    "xgb_model": "xgb_model",
+                },
+                outputs="all_trained_models",
+                name="aggregate_models_node",
+            ),
+            node(
+                func=aggregate_metrics,
+                inputs={
+                    "rf_metrics": "rf_metrics",
+                    "dt_metrics": "dt_metrics",
+                    "xgb_metrics": "xgb_metrics",
+                },
+                outputs="all_evaluation_metrics",
+                name="aggregate_metrics_node",
+            ),
+            # --- Nodo de Comparación ---
+            node(
+                func=compare_models_and_select_best,
+                inputs={
+                    "models": "all_trained_models",
+                    "metrics": "all_evaluation_metrics",
+                },
+                outputs=[
+                    "best_model",
+                    "best_model_metrics",
+                ],  # El nodo ahora emite dos outputs
+                name="select_best_model_node",
+            ),
+            # --- Nodos de gráficos para el mejor modelo ---
             node(
                 func=plot_roc_curve,
-                inputs=["y_test", "rf_evaluation_metrics"],
-                outputs="rf_roc_curve_plot",
-                name="plot_rf_roc_curve_node",
+                inputs=["y_test", "best_model_metrics"],
+                outputs="best_model_roc_curve_plot",
+                name="plot_best_model_roc_curve_node",
             ),
-            # Nodo 5: Genera el gráfico de importancia de características
             node(
                 func=plot_feature_importance,
-                inputs="rf_evaluation_metrics",
-                outputs="rf_feature_importance_plot",
-                name="plot_rf_feature_importance_node",
+                inputs="best_model_metrics",
+                outputs="best_model_feature_importance_plot",
+                name="plot_best_model_feature_importance_node",
             ),
         ],
         namespace="model_training",
         inputs="model_input_data",
         outputs={
-            "best_random_forest_model",
-            "rf_evaluation_metrics",
-            "rf_roc_curve_plot",
-            "rf_feature_importance_plot",
+            "best_model",
+            "best_model_metrics",
+            "best_model_roc_curve_plot",
+            "best_model_feature_importance_plot",
         },
     )

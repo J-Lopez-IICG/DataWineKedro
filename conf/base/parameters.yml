@@ -22,6 +22,23 @@ model_training:
       max_depth: [10, 20, None]
       min_samples_split: [2, 5]
       min_samples_leaf: [1, 2]
+
+    # Parámetros para GridSearchCV de DecisionTree
+    param_grid_dt:
+      max_depth: [3, 5, 7, 10, None]
+      min_samples_leaf: [1, 5, 10, 20]
+      min_samples_split: [2, 5, 10]
+      criterion: ['gini', 'entropy']
+
+    # Parámetros para GridSearchCV de XGBoost
+    param_grid_xgb:
+      n_estimators: [100, 200, 300]
+      learning_rate: [0.01, 0.05, 0.1]
+      max_depth: [3, 5, 7]
+      subsample: [0.7, 0.8, 0.9]
+      colsample_bytree: [0.7, 0.8, 0.9]
+      gamma: [0, 0.1, 0.2]
+      
     grid_search_cv_folds: 5
     grid_search_scoring: "roc_auc"
     grid_search_n_jobs: -1

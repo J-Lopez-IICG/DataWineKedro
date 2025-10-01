@@ -20,12 +20,13 @@ La hipótesis central de este análisis es que **las propiedades fisicoquímicas
 El proyecto se organiza en los siguientes pipelines principales:
 
 *   **`data_processing`**: Se enfoca en la limpieza y preparación inicial de los datos. Toma los datos crudos del vino, elimina filas con valores nulos y duplicados, renombra columnas a español, crea la variable objetivo binaria `Calidad_Binaria` y selecciona las características relevantes. Guarda los datos procesados (`processed_wine_data`) listos para el modelado.
-*   **`data_science`**: Contiene la lógica de Machine Learning. Este pipeline:
+*   **`model_training`**: Contiene la lógica de Machine Learning. Este pipeline:
     *   Divide los datos limpios en conjuntos de entrenamiento y prueba (70/30, estratificado).
-    *   Entrena y ajusta hiperparámetros para tres modelos de clasificación: `DecisionTreeClassifier`, `RandomForestClassifier` y `XGBClassifier`.
+    *   Entrena y ajusta hiperparámetros para tres modelos de clasificación: `DecisionTreeClassifier`, `RandomForestClassifier` y `XGBClassifier`, utilizando **validación cruzada K-Fold (Stratified K-Fold)** para una evaluación robusta.
     *   Evalúa cada modelo utilizando métricas como Accuracy, Classification Report y AUC.
-    *   Guarda los mejores modelos entrenados.
-*   **`reporting`**: Se encarga de la visualización de resultados y la comparación de modelos. Carga los modelos entrenados y los datos de prueba para generar curvas ROC, reportes de clasificación y gráficos de importancia de características para cada modelo, permitiendo una comparación clara de su rendimiento.
+    *   Compara los modelos y selecciona el de mejor rendimiento.
+    *   Guarda el mejor modelo entrenado.
+*   **`reporting`**: Se encarga de la visualización de resultados y la comparación de modelos. Carga el mejor modelo entrenado y sus métricas para generar curvas ROC y gráficos de importancia de características, permitiendo una comparación clara de su rendimiento.
 
 ---
 
@@ -42,7 +43,7 @@ El proyecto se organiza en los siguientes pipelines principales:
 
 ## Resultados del Modelo (Pipeline Kedro)
 
-Esta sección presenta las conclusiones detalladas y los artefactos generados por el pipeline de Kedro, que encapsula el proceso de modelado predictivo para la clasificación de la calidad del vino. Hemos realizado un análisis comparativo exhaustivo de tres modelos de clasificación (Árbol de Decisión, Random Forest y XGBoost), incluyendo un riguroso ajuste de hiperparámetros para cada uno.
+Esta sección presenta las conclusiones detalladas y los artefactos generados por el pipeline de Kedro, que encapsula el proceso de modelado predictivo para la clasificación de la calidad del vino. Hemos realizado un análisis comparativo exhaustivo de tres modelos de clasificación (Árbol de Decisión, Random Forest y XGBoost), incluyendo un riguroso ajuste de hiperparámetros para cada uno mediante **validación cruzada K-Fold (Stratified K-Fold)**.
 
 El pipeline de `reporting` se encarga de consolidar y visualizar estos resultados, proporcionando una visión clara del rendimiento de cada modelo y los factores clave que influyen en la calidad del vino.
 
@@ -58,13 +59,13 @@ Este resultado sugiere que, para el problema de clasificación de la calidad del
 
 ### Visualización Detallada del Rendimiento
 
-El pipeline genera curvas ROC para cada modelo ajustado, permitiendo una comparación visual directa de su capacidad discriminatoria. A continuación, se muestra un ejemplo de la curva ROC para el mejor modelo (Random Forest):
+El pipeline genera curvas ROC para el mejor modelo ajustado, permitiendo una comparación visual directa de su capacidad discriminatoria. A continuación, se muestra la curva ROC para el mejor modelo:
 
-![Curva ROC del Mejor Random Forest](data/07_reporting/rf_roc_curve.png)
+![Curva ROC del Mejor Modelo](data/07_reporting/best_model_roc_curve.png)
 
-Además, se generan gráficos de importancia de características para entender qué propiedades fisicoquímicas son más relevantes para la predicción de la calidad del vino. Aquí un ejemplo para el Random Forest:
+Además, se generan gráficos de importancia de características para entender qué propiedades fisicoquímicas son más relevantes para la predicción de la calidad del vino. Aquí un ejemplo para el mejor modelo:
 
-![Importancia de Características del Mejor Random Forest](data/07_reporting/rf_feature_importance.png)
+![Importancia de Características del Mejor Modelo](data/07_reporting/best_model_feature_importance.png)
 
 El gráfico de importancia de características revela que no todas las propiedades fisicoquímicas influyen de la misma manera en la calidad del vino. Las conclusiones clave son:
 *   **El `Alcohol` es el factor más determinante**, siendo el predictor más fuerte para el modelo.
@@ -73,7 +74,7 @@ El gráfico de importancia de características revela que no todas las propiedad
 
 ### La Importancia del Ajuste de Hiperparámetros
 
-El proceso de ajuste de hiperparámetros mediante GridSearchCV fue fundamental para optimizar el rendimiento de todos los modelos. Se observaron mejoras significativas en el AUC para el Árbol de Decisión y el Random Forest. Aunque el AUC de XGBoost se mantuvo en 0.87 después del ajuste, esto indica que los parámetros iniciales ya eran bastante competitivos o que el rango de búsqueda explorado no reveló mejoras significativas adicionales.
+El proceso de ajuste de hiperparámetros mediante GridSearchCV, utilizando **validación cruzada K-Fold**, fue fundamental para optimizar el rendimiento de todos los modelos. Se observaron mejoras significativas en el AUC para el Árbol de Decisión y el Random Forest. Aunque el AUC de XGBoost se mantuvo en 0.87 después del ajuste, esto indica que los parámetros iniciales ya eran bastante competitivos o que el rango de búsqueda explorado no reveló mejoras significativas adicionales.
 
 ### Robustez de los Modelos de Ensamble
 
@@ -81,7 +82,7 @@ Como era de esperar, tanto Random Forest como XGBoost, al ser algoritmos de ensa
 
 ### XGBoost no Siempre es el "Ganador" Automático
 
-A pesar de la reputación de XGBoost como un algoritmo de alto rendimiento en muchas competiciones de Machine Learning, en este caso particular, el Random Forest demostró ser ligeramente superior. Esta observación resalta la importancia de:
+Aunque XGBoost es un algoritmo de alto rendimiento en muchas competiciones de Machine Learning, en este caso particular, el Random Forest demostró ser ligeramente superior. Esta observación resalta la importancia de:
 
 *   **Evaluar múltiples algoritmos:** No hay un "mejor" algoritmo universal; el rendimiento óptimo depende de las características específicas del dataset.
 *   **Ajuste exhaustivo:** Cada algoritmo requiere un ajuste cuidadoso de sus hiperparámetros para maximizar su potencial en un problema dado.

@@ -8,6 +8,8 @@ import matplotlib.figure
 
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.tree import DecisionTreeClassifier
+import xgboost as xgb
 from sklearn.metrics import (
     accuracy_score,
     classification_report,
@@ -99,17 +101,138 @@ def train_random_forest_model(
     return best_model_rf
 
 
+def train_decision_tree_model(
+    X_train: pd.DataFrame, y_train: pd.Series, parameters: Dict[str, Any]
+) -> DecisionTreeClassifier:
+    log.info("--- Ajuste de Hiperparámetros para Decision Tree (GridSearchCV) ---")
+
+    param_grid_dt = parameters["param_grid_dt"]
+
+    model_dt_base = DecisionTreeClassifier(random_state=parameters["random_state"])
+
+    grid_search_dt = GridSearchCV(
+        estimator=model_dt_base,
+        param_grid=param_grid_dt,
+        cv=parameters["grid_search_cv_folds"],
+        scoring=parameters["grid_search_scoring"],
+        n_jobs=parameters["grid_search_n_jobs"],
+        verbose=parameters["grid_search_verbose"],
+    )
+
+    grid_search_dt.fit(X_train, y_train)
+
+    log.info(
+        f"\nMejores parámetros encontrados para Decision Tree: {grid_search_dt.best_params_}"
+    )
+    log.info(
+        f"Mejor AUC en validación cruzada para Decision Tree: {grid_search_dt.best_score_:.4f}"
+    )
+
+    best_model_dt = grid_search_dt.best_estimator_
+    log.info("--- Entrenamiento del Mejor Modelo Decision Tree completado ---")
+
+    return best_model_dt
+
+
+def train_xgboost_model(
+    X_train: pd.DataFrame, y_train: pd.Series, parameters: Dict[str, Any]
+) -> xgb.XGBClassifier:
+    log.info("--- Ajuste de Hiperparámetros para XGBoost (GridSearchCV) ---")
+
+    param_grid_xgb = parameters["param_grid_xgb"]
+
+    neg_count = y_train.value_counts()[0]
+    pos_count = y_train.value_counts()[1]
+    scale_pos_weight_value = neg_count / pos_count
+
+    model_xgb_base = xgb.XGBClassifier(
+        objective="binary:logistic",
+        eval_metric="logloss",
+        use_label_encoder=False,
+        random_state=parameters["random_state"],
+        scale_pos_weight=scale_pos_weight_value,
+    )
+
+    grid_search_xgb = GridSearchCV(
+        estimator=model_xgb_base,
+        param_grid=param_grid_xgb,
+        cv=parameters["grid_search_cv_folds"],
+        scoring=parameters["grid_search_scoring"],
+        n_jobs=parameters["grid_search_n_jobs"],
+        verbose=parameters["grid_search_verbose"],
+    )
+
+    grid_search_xgb.fit(X_train, y_train)
+
+    log.info(
+        f"\nMejores parámetros encontrados para XGBoost: {grid_search_xgb.best_params_}"
+    )
+    log.info(
+        f"Mejor AUC en validación cruzada para XGBoost: {grid_search_xgb.best_score_:.4f}"
+    )
+
+    best_model_xgb = grid_search_xgb.best_estimator_
+    log.info("--- Entrenamiento del Mejor Modelo XGBoost completado ---")
+
+    return best_model_xgb
+
+
+def compare_models_and_select_best(
+    models: Dict[str, Any], metrics: Dict[str, Dict[str, Any]]
+) -> Tuple[Any, Dict[str, Any]]:
+    """
+    Compara los modelos basándose en su métrica AUC y devuelve el mejor modelo y sus métricas.
+    """
+    best_model_name = None
+    best_auc = -1.0
+    best_metrics_dict = {}
+
+    for model_key, metric_dict in metrics.items():
+        auc = metric_dict.get("auc_score", 0.0)
+        log.info(f"Evaluando modelo: {model_key} con AUC: {auc}")
+        if auc > best_auc:
+            best_auc = auc
+            best_model_name = model_key  # Esto será 'rf_metrics', 'dt_metrics', etc.
+            best_metrics_dict = metric_dict
+
+    if best_model_name is None:
+        raise ValueError("No se pudo determinar el mejor modelo.")
+
+    # Extraer el prefijo del nombre del modelo (ej. 'rf' de 'rf_metrics')
+    model_prefix = best_model_name.replace("_metrics", "")
+    # Construir la clave correcta para el diccionario de modelos (ej. 'rf_model')
+    model_key_in_models = f"{model_prefix}_model"
+
+    log.info(f"El mejor modelo es '{model_key_in_models}' con un AUC de {best_auc:.4f}")
+
+    return models[model_key_in_models], best_metrics_dict
+
+
+def aggregate_models(**kwargs) -> Dict[str, Any]:
+    """Agrega todos los modelos entrenados en un solo diccionario.
+    Las claves del diccionario serán los nombres de los datasets de entrada.
+    """
+    return kwargs
+
+
+def aggregate_metrics(**kwargs) -> Dict[str, Dict[str, Any]]:
+    """Agrega todas las métricas de evaluación en un solo diccionario.
+    Las claves del diccionario serán los nombres de los datasets de entrada.
+    """
+    return kwargs
+
+
 def evaluate_model(
-    model: RandomForestClassifier,
+    model: Any,
     X_test: pd.DataFrame,
     y_test: pd.Series,
     X_train_columns: pd.Index,
 ) -> Dict[str, Any]:
     """
-    Evalúa el modelo Random Forest entrenado y calcula métricas de rendimiento.
+    Evalúa el modelo entrenado y calcula métricas de rendimiento.
 
     Args:
-        model: El modelo Random Forest entrenado.
+        model: El modelo entrenado.
         X_test: Características del conjunto de prueba.
         y_test: Variable objetivo del conjunto de prueba.
         X_train_columns: Nombres de las columnas de X_train (pd.Index).
@@ -117,38 +240,37 @@ def evaluate_model(
     Returns:
         Un diccionario con métricas de evaluación, probabilidades de predicción y la importancia de las características.
     """
-    log.info("\n--- Evaluación del Mejor Modelo Random Forest ---")
+    model_name = model.__class__.__name__
+    log.info(f"\n--- Evaluación del Modelo {model_name} ---")
 
-    y_pred_best_rf = model.predict(X_test)
-    y_pred_proba_best_rf = model.predict_proba(X_test)[:, 1]
+    y_pred = model.predict(X_test)
+    y_pred_proba = model.predict_proba(X_test)[:, 1]
 
-    accuracy = accuracy_score(y_test, y_pred_best_rf)
-    classification_rep = classification_report(y_test, y_pred_best_rf, output_dict=True)
-    auc_score = roc_auc_score(y_test, y_pred_proba_best_rf)
+    accuracy = accuracy_score(y_test, y_pred)
+    classification_rep = classification_report(y_test, y_pred, output_dict=True)
+    auc_score = roc_auc_score(y_test, y_pred_proba)
 
-    log.info(f"Precisión (Accuracy) del mejor Random Forest: {accuracy:.4f}")
-    log.info("\nReporte de Clasificación del mejor Random Forest:")
-    log.info(classification_report(y_test, y_pred_best_rf))
-    log.info(f"AUC (Area Under the Curve) del mejor Random Forest: {auc_score:.4f}")
+    log.info(f"Precisión (Accuracy) de {model_name}: {accuracy:.4f}")
+    log.info(f"\nReporte de Clasificación de {model_name}:")
+    log.info(classification_report(y_test, y_pred))
+    log.info(f"AUC (Area Under the Curve) de {model_name}: {auc_score:.4f}")
 
     # Importancia de las características
-    importancia_caracteristicas_best_rf = pd.DataFrame(
+    importancia_caracteristicas = pd.DataFrame(
         {"Caracteristica": X_train_columns, "Importancia": model.feature_importances_}
     ).sort_values(by="Importancia", ascending=False)
 
-    log.info("\nImportancia de las Características del Mejor Random Forest:")
-    log.info(importancia_caracteristicas_best_rf)
+    log.info(f"\nImportancia de las Características de {model_name}:")
+    log.info(importancia_caracteristicas)
 
     evaluation_results = {
         "accuracy": accuracy,
         "classification_report": classification_rep,
         "auc_score": auc_score,
-        "y_pred_proba": y_pred_proba_best_rf.tolist(),
-        "feature_importances": importancia_caracteristicas_best_rf.to_dict(
-            orient="records"
-        ),
+        "y_pred_proba": y_pred_proba.tolist(),
+        "feature_importances": importancia_caracteristicas.to_dict(orient="records"),
     }
-    log.info("--- Evaluación del modelo completada ---")
+    log.info(f"--- Evaluación del modelo {model_name} completada ---")
     return evaluation_results
 
 

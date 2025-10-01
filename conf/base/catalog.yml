@@ -48,22 +48,37 @@ y_test:
 X_train_columns:
   type: MemoryDataSet
 
-# El mejor modelo Random Forest entrenado
-best_random_forest_model:
+# El mejor modelo seleccionado por el pipeline
+best_model:
   type: kedro_datasets.pickle.PickleDataset 
-  filepath: data/06_models/best_random_forest_model.pkl
+  filepath: data/06_models/best_model.pkl
 
-# Métricas de evaluación del modelo (guardadas como JSON)
-rf_evaluation_metrics:
+# Métricas de evaluación del modelo Random Forest (guardadas como JSON)
+rf_metrics:
   type: kedro_datasets.json.JSONDataset
   filepath: data/07_reporting/rf_evaluation_metrics.json
 
-# Gráfico de la curva ROC (guardado como imagen)
-rf_roc_curve_plot:
-  type: kedro_datasets.matplotlib.MatplotlibDataset 
-  filepath: data/07_reporting/rf_roc_curve.png
+# Métricas de evaluación del modelo Decision Tree (guardadas como JSON)
+dt_metrics:
+  type: kedro_datasets.json.JSONDataset
+  filepath: data/07_reporting/dt_evaluation_metrics.json
 
-# Gráfico de importancia de características (guardado como imagen)
-rf_feature_importance_plot:
+# Métricas de evaluación del modelo XGBoost (guardadas como JSON)
+xgb_metrics:
+  type: kedro_datasets.json.JSONDataset
+  filepath: data/07_reporting/xgb_evaluation_metrics.json
+
+# Métricas de evaluación del MEJOR modelo (guardadas como JSON)
+best_model_metrics:
+  type: kedro_datasets.json.JSONDataset
+  filepath: data/07_reporting/best_model_evaluation_metrics.json
+
+# Gráfico de la curva ROC del MEJOR modelo (guardado como imagen)
+best_model_roc_curve_plot:
   type: kedro_datasets.matplotlib.MatplotlibDataset 
-  filepath: data/07_reporting/rf_feature_importance.png
+  filepath: data/07_reporting/best_model_roc_curve.png
+
+# Gráfico de importancia de características del MEJOR modelo (guardado como imagen)
+best_model_feature_importance_plot:
+  type: kedro_datasets.matplotlib.MatplotlibDataset 
+  filepath: data/07_reporting/best_model_feature_importance.png
